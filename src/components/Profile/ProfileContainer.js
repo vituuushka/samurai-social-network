@@ -4,7 +4,7 @@ import ProfileInfo from "./ProfileInfo/ProfileInfo.js";
 import s from "./Profile.module.css";
 import Post from "./MyPosts/Post/Post.js";
 import Profile from "./Profile.js";
-import {getUserProfile, getStatus, updateStatus } from "../../redux/profilePage-reducer.js";
+import {getUserProfile, getStatus, updateStatus, savePhoto, saveProfile } from "../../redux/profilePage-reducer.js";
 import axios from "axios";
 import { connect } from "react-redux";
 import {
@@ -17,8 +17,7 @@ import { compose } from "redux";
 
 
 class ProfileContainer extends React.Component {
-  
-  componentDidMount() {
+  refreshProfile() {
     let profileId = this.props.router.params.profileId
     if(!profileId) {
       profileId=this.props.authorizedUserId
@@ -26,9 +25,20 @@ class ProfileContainer extends React.Component {
     this.props.getUserProfile(profileId);
     this.props.getStatus(profileId);
   }
+  componentDidMount() {
+    this.refreshProfile()
+  }
+  componentDidUpdate(prevProps,prevState,snapshot) {
+    if( this.props.router.params.profileId != prevProps.router.params.profileId) {
+    this.refreshProfile()
+  }
+  }
   render() {
    
-  return (<Profile {...this.props} profile={this.props.profile} status={this.props.status} updateStatus={this.props.updateStatus} />)
+  return (<Profile {...this.props} profile={this.props.profile}
+     status={this.props.status} updateStatus={this.props.updateStatus}
+     isOwner={!this.props.router.params.profileId} 
+     savePhoto={this.props.savePhoto} saveProfile={this.props.saveProfile} />)
 }
 };
 
@@ -58,7 +68,7 @@ function withRouter(Container) {
 
 
 export default compose(
-  connect(mapStateToProps,{getUserProfile, getStatus, updateStatus}),
+  connect(mapStateToProps,{getUserProfile, getStatus, updateStatus, savePhoto, saveProfile}),
   withRouter,
   withAuthRedirect
 )(ProfileContainer)

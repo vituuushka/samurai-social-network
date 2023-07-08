@@ -27,7 +27,8 @@ const LoginForm = (props) => (
     <Formik
         initialValues = {{
             email: '',
-            password: ''
+            password: '',
+            captcha: ''
 
         }}
         onSubmit = { (values)  => {
@@ -53,6 +54,8 @@ const LoginForm = (props) => (
             <label>remember me</label>
             <Field name='rememberMe' type='checkbox' />
             </div>
+            {props.captchaURL && <img src={props.captchaURL} /> }
+            {props.captchaURL && <Field name='captcha' component='input' placeholder='Symbols from image' /> }
             <div><button type='submit'>Login</button></div>
             {/* <div>
         {formik.status ? <span>{formik.status}</span>: null}
@@ -65,18 +68,19 @@ const LoginForm = (props) => (
 
 const Login = (props) => {
     const onSubmitForm = (values) => {
-        props.login(values.email, values.password, values.rememberMe)
+        props.login(values.email, values.password, values.rememberMe, values.captcha)
     }
     if(props.isAuth) {
         return (<Navigate to='/profile' />)
     }
     return (<div>
         <h1>Login</h1>
-    <LoginForm onSubmitForm={onSubmitForm}/>
+    <LoginForm onSubmitForm={onSubmitForm} captchaURL={props.captchaURL}/>
     </div>)
 }
 const mapStateToProps =(state) => ({
-    isAuth: state.auth.isAuth
+    isAuth: state.auth.isAuth,
+    captchaURL: state.auth.captchaURL
 })
 
 export default connect(mapStateToProps, {login})(Login);
